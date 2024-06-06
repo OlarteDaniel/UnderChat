@@ -1,23 +1,35 @@
-console.log('Front conectado');
-
 const socket = io();
-console.log(socket);
-
 const chatbox = document.getElementById('chatbox');
+let username ;
+
+Swal.fire({
+    title:"Identificate",
+    icon:"question",
+    input:"text",
+    inputValidator: (value) =>{
+        if(!value){
+            return "Ingrese un nombre!!!";
+        }
+    },
+    allowOutsideClick:false,
+    allowEscapeKey:false
+}).then(response => {
+    username = response.value;
+})
+
 
 chatbox.addEventListener('keyup',(event) =>{
     if(event.key === 'Enter'){
-        socket.emit('message',chatbox.value);
+        socket.emit('message',{username:username,message:chatbox.value});
         chatbox.value = '';
     }
 })
 
 socket.on('log',data => {
-    console.log(data)
     const logs = document.getElementById('messagesLog');
     let messages = '';
-    data.forEach(message => {
-        messages += `${socket.id} dice: ${message} <br/>`
+    data.forEach(logItem => {
+        messages += `${logItem.username} dice: ${logItem.message} <br/>`
     })
     logs.innerHTML = messages;
 })
